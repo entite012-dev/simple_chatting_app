@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>✦ Chat</title>
+    <style>
+        /* ─── Reset & Base ─── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f6f8fa;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #1e293b;
+        }
+
+        /* ─── App Container ─── */
+        .app {
+            width: 100%;
+            max-width: 600px;
+            height: 100vh;
+            max-height: 700px;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @media (max-width: 640px) {
+            .app {
+                max-height: 100vh;
+                border-radius: 0;
+                height: 100vh;
+            }
+        }
+
+        /* ─── Header ─── */
+        .header {
+            padding: 18px 24px;
+            background: #ffffff;
+            border-bottom: 1px solid #eef2f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .header .brand {
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .header .brand span {
+            color: #3b82f6;
+        }
+
+        .header .user-id {
+            background: #f1f5f9;
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .header .user-id .badge {
+            background: #3b82f6;
+            color: #fff;
+            border-radius: 100px;
+            padding: 0 8px;
+            font-size: 11px;
+            line-height: 18px;
+        }
+
+        /* ─── Add Contact ─── */
+        .add-section {
+            padding: 14px 24px;
+            background: #fafbfc;
+            border-bottom: 1px solid #eef2f6;
+            flex-shrink: 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .add-section input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+            background: #fff;
+        }
+
+        .add-section input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .add-section input::placeholder {
+            color: #94a3b8;
+        }
+
+        .add-section button {
+            padding: 10px 20px;
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .add-section button:hover {
+            background: #2563eb;
+        }
+
+        .add-section button:active {
+            transform: scale(0.96);
+        }
+
+        .add-section button:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .add-feedback {
+            font-size: 13px;
+            color: #64748b;
+            padding: 0 4px;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .add-feedback.success {
+            color: #22c55e;
+        }
+        .add-feedback.error {
+            color: #ef4444;
+        }
+
+        /* ─── Main Layout (contacts + chat) ─── */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        /* ─── Contacts Sidebar ─── */
+        .contacts-panel {
+            width: 180px;
+            background: #fafbfc;
+            border-right: 1px solid #eef2f6;
+            overflow-y: auto;
+            flex-shrink: 0;
+            padding: 8px 0;
+        }
+
+        .contacts-panel .label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #94a3b8;
+            padding: 12px 16px 6px 16px;
+            font-weight: 600;
+        }
+
+        .contact-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-size: 14px;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contact-item:hover {
+            background: #f1f5f9;
+        }
+
+        .contact-item.active {
+            background: #eff6ff;
+            border-left-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .contact-item .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            flex-shrink: 0;
+        }
+
+        .contact-item .name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .contact-item .online-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #94a3b8;
+            flex-shrink: 0;
+        }
+
+        .contact-item .online-dot.online {
+            background: #22c55e;
+        }
+
+        .empty-contacts {
+            padding: 30px 16px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .empty-contacts .icon {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .contacts-panel {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #eef2f6;
+                max-height: 40vh;
+            }
+            .main {
+                flex-direction: column;
+            }
+        }
+
+        /* ─── Chat Area ─── */
+        .chat-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            min-width: 0;
+        }
+
+        .chat-placeholder {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .chat-placeholder .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.4;
+        }
+
+        .chat-placeholder p {
+            font-size: 15px;
+            max-width: 240px;
+        }
+
+        .chat-placeholder .sub {
+            font-size: 13px;
+            margin-top: 6px;
+            opacity: 0.7;
+        }
+
+        .chat-header {
+            padding: 12px 20px;
+            border-bottom: 1px solid #eef2f6;
+            font-weight: 600;
+            font-size: 15px;
+            flex-shrink: 0;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-header .back-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 4px;
+            color: #64748b;
+        }
+
+        @media (max-width: 480px) {
+            .chat-header .back-btn {
+                display: block;
+            }
+            .chat-panel .chat-placeholder {
+                padding: 20px;
+            }
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: #fafbfc;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 10px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-break: break-word;
+            animation: msgIn 0.2s ease;
+        }
+
+        @keyframes msgIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background: #3b82f6;
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 4px;
+            color: #1e293b;
+        }
+
+        .message .time {
+            font-size: 10px;
+            opacity: 0.6;
+            margin-top: 4px;
+            display: block;
+            text-align: right;
+        }
+
+        .message.sent .time {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .message.received .time {
+            color: #94a3b8;
+        }
+
+        .chat-input-area {
+            padding: 12px 20px;
+            border-top: 1px solid #eef2f6;
+            display: flex;
+            gap: 10px;
+            background: #ffffff;
+            flex-shrink: 0;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 100px;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+            background: #f8fafc;
+        }
+
+        .chat-input-area input:focus {
+            border-color: #3b82f6;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        }
+
+        .chat-input-area input::placeholder {
+            color: #94a3b8;
+        }
+
+        .chat-input-area button {
+            padding: 10px 22px;
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            flex-shrink: 0;
+        }
+
+        .chat-input-area button:hover {
+            background: #2563eb;
+        }
+
+        .chat-input-area button:active {
+            transform: scale(0.96);
+        }
+
+        .chat-input-area button:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* ─── Scrollbar ─── */
+        .chat-messages::-webkit-scrollbar,
+        .contacts-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track,
+        .contacts-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb,
+        .contacts-panel::-webkit-scrollbar-thumb {
+            background: #d1d9e6;
+            border-radius: 10px;
+        }
+
+        /* ─── Toast / Notification ─── */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #1e293b;
+            color: #f1f5f9;
+            padding: 12px 24px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: all 0.35s ease;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ─── Loading shimmer ─── */
+        .loading-dots {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+            padding: 4px 0;
+        }
+
+        .loading-dots span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #94a3b8;
+            animation: dotPulse 1.2s infinite ease-in-out;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes dotPulse {
+            0%,
+            80%,
+            100% {
+                transform: scale(0.6);
+                opacity: 0.4;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* ─── Utilities ─── */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ─── Toast ─── -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ─── App ─── -->
+    <div class="app" id="app">
+
+        <!-- Header -->
+        <div class="header">
+            <div class="brand">✦ <span>Chat</span></div>
+            <div class="user-id">
+                ID <span class="badge" id="userIdDisplay">—</span>
+            </div>
+        </div>
+
+        <!-- Add Contact -->
+        <div class="add-section">
+            <input
+            type="number"
+            id="addInput"
+            placeholder="Enter user ID to add…"
+            min="1"
+            />
+            <button id="addBtn">Add</button>
+            <span class="add-feedback" id="addFeedback"></span>
+        </div>
+
+        <!-- Main -->
+        <div class="main">
+
+            <!-- Contacts -->
+            <div class="contacts-panel" id="contactsPanel">
+                <div class="label">Contacts</div>
+                <div id="contactsList">
+                    <div class="empty-contacts">
+                        <span class="icon">👤</span>
+                        No contacts yet.<br />
+                        Add someone by their ID above.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat -->
+            <div class="chat-panel" id="chatPanel">
+                <div class="chat-placeholder" id="chatPlaceholder">
+                    <div class="icon">💬</div>
+                    <p>Select a contact to start chatting</p>
+                    <div class="sub">Messages appear here in real time</div>
+                </div>
+
+                <div class="chat-header hidden" id="chatHeader">
+                    <button class="back-btn" id="backBtn">←</button>
+                    <span id="chatContactName">—</span>
+                </div>
+
+                <div class="chat-messages hidden" id="chatMessages"></div>
+
+                <div class="chat-input-area hidden" id="chatInputArea">
+                    <input
+                    type="text"
+                    id="msgInput"
+                    placeholder="Type a message…"
+                    autocomplete="off"
+                    />
+                    <button id="sendBtn">Send</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ─── Socket.IO ─── -->
+    <script src="/socket.io/socket.io.js"></script>
+    </script>
+
+    <script>
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  STATE
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        const STATE = {
+            userId: null, // my permanent ID
+            contacts: [], // array of user IDs
+            selected: null, // currently selected contact ID
+            messages: {}, // { contactId: [msg, ...] }
+            online: {}, // { userId: true/false }
+            socket: null,
+        };
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  DOM refs
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        const $ = (s) => document.querySelector(s);
+        const $$ = (s) => document.querySelectorAll(s);
+
+        const userIdDisplay = $('#userIdDisplay');
+        const addInput = $('#addInput');
+        const addBtn = $('#addBtn');
+        const addFeedback = $('#addFeedback');
+        const contactsList = $('#contactsList');
+        const chatPlaceholder = $('#chatPlaceholder');
+        const chatHeader = $('#chatHeader');
+        const chatContactName = $('#chatContactName');
+        const chatMessages = $('#chatMessages');
+        const chatInputArea = $('#chatInputArea');
+        const msgInput = $('#msgInput');
+        const sendBtn = $('#sendBtn');
+        const backBtn = $('#backBtn');
+        const toast = $('#toast');
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  TOAST
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        let toastTimeout;
+
+        function showToast(text) {
+            toast.textContent = text;
+            toast.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => toast.classList.remove('show'), 2800);
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  API HELPERS
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        async function fetchJSON(url, opts = {}) {
+            const res = await fetch(url, opts);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  USER ID MANAGEMENT
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        async function getOrCreateUserId() {
+            const stored = localStorage.getItem('chat_user_id');
+            if (stored) {
+                // verify it still exists on server
+                try {
+                    const data = await fetchJSON(`/api/user/${stored}`);
+                    if (data.exists) {
+                        return parseInt(stored, 10);
+                    }
+                } catch (_) { /* fall through */ }
+            }
+
+            // create new user
+            const data = await fetchJSON('/api/new-user');
+            const id = data.id;
+            localStorage.setItem('chat_user_id', String(id));
+            return id;
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  CONTACTS (stored in localStorage)
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function loadContacts() {
+            try {
+                const raw = localStorage.getItem('chat_contacts');
+                return raw ? JSON.parse(raw) : [];
+            } catch { return []; }
+        }
+
+        function saveContacts(contacts) {
+            localStorage.setItem('chat_contacts', JSON.stringify(contacts));
+        }
+
+        async function addContact(id) {
+            id = parseInt(id, 10);
+            if (isNaN(id) || id < 1) {
+                addFeedback.textContent = 'Invalid ID';
+                addFeedback.className = 'add-feedback error';
+                return false;
+            }
+            if (id === STATE.userId) {
+                addFeedback.textContent = 'That\'s you!';
+                addFeedback.className = 'add-feedback error';
+                return false;
+            }
+            if (STATE.contacts.includes(id)) {
+                addFeedback.textContent = 'Already added';
+                addFeedback.className = 'add-feedback error';
+                return false;
+            }
+
+            // verify user exists on server
+            try {
+                const data = await fetchJSON(`/api/user/${id}`);
+                if (!data.exists) {
+                    addFeedback.textContent = 'User not found';
+                    addFeedback.className = 'add-feedback error';
+                    return false;
+                }
+            } catch {
+                addFeedback.textContent = 'Server error';
+                addFeedback.className = 'add-feedback error';
+                return false;
+            }
+
+            STATE.contacts.push(id);
+            saveContacts(STATE.contacts);
+            renderContacts();
+            addFeedback.textContent = 'Added ✓';
+            addFeedback.className = 'add-feedback success';
+            showToast(`Added user ${id}`);
+            return true;
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  RENDER CONTACTS
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function renderContacts() {
+            const list = contactsList;
+            const contacts = STATE.contacts;
+
+            if (!contacts.length) {
+                list.innerHTML = `
+              <div class="empty-contacts">
+                <span class="icon">👤</span>
+                No contacts yet.<br />
+                Add someone by their ID above.
+              </div>
+            `;
+                return;
+            }
+
+            let html = '';
+            contacts.forEach((id) => {
+                const active = id === STATE.selected ? 'active' : '';
+                const online = STATE.online[id] ? 'online' : '';
+                const initial = String(id).slice(0, 2);
+                html += `
+              <div class="contact-item ${active}" data-id="${id}">
+                <div class="avatar">${initial}</div>
+                <span class="name">User ${id}</span>
+                <span class="online-dot ${online}"></span>
+              </div>
+            `;
+            });
+            list.innerHTML = html;
+
+            // click handlers
+            list.querySelectorAll('.contact-item').forEach((el) => {
+                el.addEventListener('click', () => {
+                    const id = parseInt(el.dataset.id, 10);
+                    selectContact(id);
+                });
+            });
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  SELECT CONTACT / OPEN CHAT
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function selectContact(id) {
+            if (id === STATE.selected) return;
+            STATE.selected = id;
+            renderContacts();
+            openChat(id);
+        }
+
+        function openChat(id) {
+            // show chat UI
+            chatPlaceholder.classList.add('hidden');
+            chatHeader.classList.remove('hidden');
+            chatMessages.classList.remove('hidden');
+            chatInputArea.classList.remove('hidden');
+
+            chatContactName.textContent = `User ${id}`;
+
+            // load messages for this contact
+            renderMessages(id);
+
+            // scroll to bottom
+            setTimeout(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 50);
+
+            // focus input
+            msgInput.focus();
+
+            // mark messages as read (optional)
+        }
+
+        function closeChat() {
+            STATE.selected = null;
+            chatPlaceholder.classList.remove('hidden');
+            chatHeader.classList.add('hidden');
+            chatMessages.classList.add('hidden');
+            chatInputArea.classList.add('hidden');
+            renderContacts();
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  RENDER MESSAGES
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function renderMessages(contactId) {
+            const msgs = STATE.messages[contactId] || [];
+            const container = chatMessages;
+            if (!msgs.length) {
+                container.innerHTML = `
+              <div style="text-align:center;color:#94a3b8;padding:30px 0;font-size:14px;">
+                No messages yet. Say hello!
+              </div>
+            `;
+                return;
+            }
+
+            let html = '';
+            msgs.forEach((msg) => {
+                const isSent = msg.sender_id === STATE.userId;
+                const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit',
+                        minute: '2-digit' }) : '';
+                html += `
+              <div class="message ${isSent ? 'sent' : 'received'}">
+                ${escapeHtml(msg.content)}
+                <span class="time">${time}</span>
+              </div>
+            `;
+            });
+            container.innerHTML = html;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // simple escape
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  SEND MESSAGE
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function sendMessage() {
+            const text = msgInput.value.trim();
+            if (!text) return;
+            if (!STATE.selected) return;
+
+            const receiverId = STATE.selected;
+            STATE.socket.emit('send-message', {
+                receiverId: receiverId,
+                content: text,
+            });
+
+            // optimistic update
+            const tempMsg = {
+                id: Date.now(),
+                sender_id: STATE.userId,
+                receiver_id: receiverId,
+                content: text,
+                timestamp: new Date().toISOString(),
+            };
+            if (!STATE.messages[receiverId]) STATE.messages[receiverId] = [];
+            STATE.messages[receiverId].push(tempMsg);
+            renderMessages(receiverId);
+
+            msgInput.value = '';
+            msgInput.focus();
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  SOCKET.IO
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function initSocket(userId) {
+            const socket = io({
+                reconnectionAttempts: 5,
+                reconnectionDelay: 1000,
+            });
+            STATE.socket = socket;
+
+            socket.on('connect', () => {
+                console.log('Socket connected');
+                socket.emit('register', userId);
+            });
+
+            socket.on('connect_error', (err) => {
+                console.warn('Socket error:', err);
+                showToast('Connection issue. Retrying…');
+            });
+
+            // ── receive a message ──
+            socket.on('message', (msg) => {
+                const senderId = msg.sender_id;
+                const receiverId = msg.receiver_id;
+
+                // if it's for me, store it
+                if (receiverId === STATE.userId) {
+                    if (!STATE.messages[senderId]) STATE.messages[senderId] = [];
+                    STATE.messages[senderId].push(msg);
+
+                    // if this contact is selected, re-render
+                    if (STATE.selected === senderId) {
+                        renderMessages(senderId);
+                    }
+                    // update contact list (online status might change)
+                    renderContacts();
+                    showToast(`New message from User ${senderId}`);
+                }
+
+                // if I sent it, already handled optimistically, but server might echo
+                // we ignore duplicates by checking if already in list
+            });
+
+            // ── message sent confirmation ──
+            socket.on('message-sent', (msg) => {
+                // server confirmed, we already did optimistic update
+                // could replace temp id with real id
+                const contactId = msg.receiver_id;
+                if (STATE.messages[contactId]) {
+                    const idx = STATE.messages[contactId].findIndex(
+                        (m) => m.id === msg.id || (m.content === msg.content && m.sender_id === STATE.userId)
+                    );
+                    if (idx !== -1) {
+                        STATE.messages[contactId][idx] = msg;
+                        if (STATE.selected === contactId) {
+                            renderMessages(contactId);
+                        }
+                    }
+                }
+            });
+
+            // ── online status ──
+            socket.on('user-online', (id) => {
+                STATE.online[id] = true;
+                renderContacts();
+            });
+
+            socket.on('user-offline', (id) => {
+                STATE.online[id] = false;
+                renderContacts();
+            });
+
+            // ── load history for a contact ──
+            socket.on('history', ({ contactId, messages }) => {
+                if (!STATE.messages[contactId]) STATE.messages[contactId] = [];
+                // merge, avoid duplicates
+                const existingIds = new Set(STATE.messages[contactId].map(m => m.id));
+                messages.forEach((m) => {
+                    if (!existingIds.has(m.id)) {
+                        STATE.messages[contactId].push(m);
+                    }
+                });
+                // sort by timestamp
+                STATE.messages[contactId].sort((a, b) =>
+                    new Date(a.timestamp) - new Date(b.timestamp)
+                );
+                if (STATE.selected === contactId) {
+                    renderMessages(contactId);
+                }
+            });
+
+            // ── reconnect ──
+            socket.on('reconnect', () => {
+                socket.emit('register', userId);
+                showToast('Reconnected');
+            });
+
+            return socket;
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  LOAD MESSAGE HISTORY FROM SERVER
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        async function loadHistory(contactId) {
+            try {
+                const data = await fetchJSON(`/api/messages/${STATE.userId}/${contactId}`);
+                if (!STATE.messages[contactId]) STATE.messages[contactId] = [];
+                const existingIds = new Set(STATE.messages[contactId].map(m => m.id));
+                data.forEach((m) => {
+                    if (!existingIds.has(m.id)) {
+                        STATE.messages[contactId].push(m);
+                    }
+                });
+                STATE.messages[contactId].sort((a, b) =>
+                    new Date(a.timestamp) - new Date(b.timestamp)
+                );
+                if (STATE.selected === contactId) {
+                    renderMessages(contactId);
+                }
+            } catch (err) {
+                console.warn('Failed to load history:', err);
+            }
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  INIT
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        async function init() {
+            try {
+                // 1. get user ID
+                const id = await getOrCreateUserId();
+                STATE.userId = id;
+                userIdDisplay.textContent = id;
+
+                // 2. load contacts
+                STATE.contacts = loadContacts();
+
+                // 3. init socket
+                initSocket(id);
+
+                // 4. render contacts
+                renderContacts();
+
+                // 5. if there's a selected contact from before? none.
+
+                // 6. load history for each contact (background)
+                STATE.contacts.forEach((cid) => {
+                    loadHistory(cid);
+                });
+
+                // 7. handle add contact
+                addBtn.addEventListener('click', async () => {
+                    const val = addInput.value.trim();
+                    if (!val) return;
+                    const num = parseInt(val, 10);
+                    if (isNaN(num)) {
+                        addFeedback.textContent = 'Enter a number';
+                        addFeedback.className = 'add-feedback error';
+                        return;
+                    }
+                    addBtn.disabled = true;
+                    const ok = await addContact(num);
+                    addBtn.disabled = false;
+                    if (ok) {
+                        addInput.value = '';
+                        // load history for new contact
+                        loadHistory(num);
+                    }
+                });
+
+                addInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') addBtn.click();
+                });
+
+                // 8. send message
+                sendBtn.addEventListener('click', sendMessage);
+                msgInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') sendMessage();
+                });
+
+                // 9. back button (mobile)
+                backBtn.addEventListener('click', closeChat);
+
+                // 10. auto-focus add input on load
+                setTimeout(() => addInput.focus(), 300);
+
+                console.log(`✦ Chat ready. Your ID: ${id}`);
+            } catch (err) {
+                console.error('Init error:', err);
+                showToast('Failed to initialize. Please refresh.');
+            }
+        }
+
+        // ── start ──
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+
+</body>
+</html>
